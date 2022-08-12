@@ -1,9 +1,9 @@
 from django.contrib import admin
 from .models import BufferFood, СompoundSettings
 
-class PostAdmin(admin.ModelAdmin):
+class IntegrAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(BufferFood, PostAdmin)
-admin.site.register(СompoundSettings, PostAdmin)
+admin.site.register(BufferFood, IntegrAdmin)
+admin.site.register(СompoundSettings, IntegrAdmin)
 
