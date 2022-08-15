@@ -7,3 +7,4 @@ class MainView(View):
             request,
             'app_label_integr/index.html'
         )
+     
