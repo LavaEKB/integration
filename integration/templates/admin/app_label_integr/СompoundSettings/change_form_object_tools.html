@@ -1,7 +1,7 @@
 {% load i18n admin_urls %}
 {% block object-tools-items %}
 
-<li><a href="#" class="btn btn-sm btn-outline-secondary" style="border-radius: 100px;  height: 20px; display: flex; align-items: center;">Проверить подключение</a></li>
+<li><a href={% url 'index' %} class="btn btn-sm btn-outline-secondary" style="border-radius: 100px;  height: 20px; display: flex; align-items: center;">Проверить подключение</a></li>
 <li>
     {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
     <a href="{% add_preserved_filters history_url %}" class="historylink">{% translate "History" %}</a>
