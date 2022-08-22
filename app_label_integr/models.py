@@ -31,8 +31,7 @@ class BufferFood(models.Model):
     def __str__(self):
         return str(self.name)
 
-
-class СompoundSettings(models.Model):
+class ConnectSettings(models.Model):
     #restaurant = models.ForeignKey("organization.Restaurant", verbose_name='Ресторан', on_delete=models.CASCADE, related_query_name='foods')
 
     APP_COMPAUND = [
@@ -40,7 +39,7 @@ class СompoundSettings(models.Model):
         ('R_Keeper', 'Р-Kипер'),
     ]
     
-    app_compaunds = models.CharField(
+    app_connections = models.CharField(
         max_length=8,
         choices=APP_COMPAUND,
         default='Iiko',
@@ -56,4 +55,4 @@ class СompoundSettings(models.Model):
         verbose_name_plural = 'Установки подключений'
 
     def __str__(self):
-        return str(self.app_compaunds)
+        return str(self.app_connections)
