@@ -51,13 +51,26 @@ class BufferFoodView(View):
         # Список блюд первой организации
         params_prods = {
             "access_token": token,
-            "revision": "0"
+            "revision": "0",
             } 
         prods = requests.get(f'https://iiko.biz:9900/api/0/nomenclature/{orgs_json[0]["id"]}', params_prods)
         prods_json = prods.json()
 
-        #print(prods_json)
+        #id_rest = prods_json['groups'][0]['id']
+        #for prods in prods_json:
+        #    if 
+
+#"['groups'][0]['id']": "24e02f41-c240-4bdc-8a8a-b76580ae10c5"
+
+        #prods_json['groups'][i] - рестораны организации
+        #prods_json['groups'][i]['additionalInfo'] - имя (код) ресторана на латинице, например Ресторан Френч - r_french
+        #prods_json['groups'][0]['id'] - id ресторана
+        #prods_json['groups'][0]['name'] - имя ресторана
+        #prods_json['products'] - меню по всем ресторанам
+        #prods_json['revision'] - ревизия меню
+        #prods_json['uploadDate'] - дата и время загрузки ревизии
+
 
         return render(request, 'app_label_integr/bufferfood.html', context={
-            'post': prods_json['groups'][1]
+            'post': prods_json['products']
     })

@@ -55,7 +55,7 @@ ROOT_URLCONF = 'integration.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [r'integration/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'integration', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
