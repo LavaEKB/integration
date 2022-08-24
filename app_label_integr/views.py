@@ -1,7 +1,7 @@
 from re import T
 from django.shortcuts import render, get_object_or_404
 from django.views import View
-from .models import ConnectSettings
+from .models import ConnectSettings, BufferFood
 import requests
 
 class MainView(View):
@@ -56,11 +56,48 @@ class BufferFoodView(View):
         prods = requests.get(f'https://iiko.biz:9900/api/0/nomenclature/{orgs_json[0]["id"]}', params_prods)
         prods_json = prods.json()
 
-        #id_rest = prods_json['groups'][0]['id']
-        #for prods in prods_json:
-        #    if 
+        # Переменные для буфера
+        restaurant_bf = orgs_json[0]["id"] # id_организации
+        name_bf = '' # Наименование продукта
+        description_bf = '' # Описание
+        price_bf = '' # Цена
+        category_bf = '' # Категория
+        image_bf = '' # Ссылка на картинку для буфера
+        imageID = '' # Уникальное имя картинки
 
-#"['groups'][0]['id']": "24e02f41-c240-4bdc-8a8a-b76580ae10c5"
+        for keys in prods_json.keys():
+            #print(keys) # Все ключи, тип string. Пять штук
+            #print(prods_json[keys]) # Три list, int, string
+            if keys == 'groups' or keys == 'productCategories' or keys == 'products':
+                for el in prods_json[keys]:
+                    #if keys == 'groups':
+                    #    if el_key == 'id':
+                    #        #print (el[el_key]) 
+                    #        restaurant_bf = el[el_key]
+
+                    if keys == 'products': 
+                        for el_key in el.keys():
+                            if el_key == 'name':
+                                name_bf = el[el_key]
+                            elif el_key == 'description':
+                                description_bf = el[el_key]
+                            elif el_key == 'price':
+                                price_bf = el[el_key]
+                            elif el_key == 'type':
+                                category_bf = el[el_key]
+                            elif el_key == 'images':
+                                if el[el_key] != None:
+                                    if len(el[el_key]) != 0: 
+                                        imageID = el[el_key][0]['imageId']
+                                        image_bf = requests.get(el[el_key][0]['imageUrl'])
+                                        with open(f'upload/images/food/{imageID}.jpg', 'wb') as img_f:
+                                            img_f.write(image_bf.content) 
+
+
+                        #BufferFood.objects.all().delete()
+
+                        # Создаем запись в буфере  
+                        #BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf)
 
         #prods_json['groups'][i] - рестораны организации
         #prods_json['groups'][i]['additionalInfo'] - имя (код) ресторана на латинице, например Ресторан Френч - r_french
@@ -72,5 +109,6 @@ class BufferFoodView(View):
 
 
         return render(request, 'app_label_integr/bufferfood.html', context={
-            'post': prods_json['products']
+            'post': 'Успешно'
+ 
     })
