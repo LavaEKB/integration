@@ -1,8 +1,11 @@
 from re import T
 from django.shortcuts import render, get_object_or_404
 from django.views import View
+from integration.settings import MEDIA_ROOT
+from integration.settings import BASE_DIR
 from .models import ConnectSettings, BufferFood
 import requests
+import os
 
 class MainView(View):
     def get(self, request, *args, **kwargs):
@@ -65,12 +68,18 @@ class BufferFoodView(View):
         image_bf = '' # Ссылка на картинку для буфера
         imageID = '' # Уникальное имя картинки
 
+        # Проверяем путь к картинкам
+        path = os.path.join(MEDIA_ROOT, 'upload', 'images', 'food/')
+        print(path)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         for keys in prods_json.keys():
             #print(keys) # Все ключи, тип string. Пять штук
             #print(prods_json[keys]) # Три list, int, string
             if keys == 'groups' or keys == 'productCategories' or keys == 'products':
                 for el in prods_json[keys]:
-                    #if keys == 'groups':
+                    #if keys == 'groups': #  ---- Не понял, что делать с ресторанами ------
                     #    if el_key == 'id':
                     #        #print (el[el_key]) 
                     #        restaurant_bf = el[el_key]
@@ -90,14 +99,15 @@ class BufferFoodView(View):
                                     if len(el[el_key]) != 0: 
                                         imageID = el[el_key][0]['imageId']
                                         image_bf = requests.get(el[el_key][0]['imageUrl'])
-                                        with open(f'upload/images/food/{imageID}.jpg', 'wb') as img_f:
+                                        with open(path + f'{imageID}.jpg', 'wb') as img_f:
                                             img_f.write(image_bf.content) 
 
 
                         #BufferFood.objects.all().delete()
 
                         # Создаем запись в буфере  
-                        #BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf)
+                        BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf)
+
 
         #prods_json['groups'][i] - рестораны организации
         #prods_json['groups'][i]['additionalInfo'] - имя (код) ресторана на латинице, например Ресторан Френч - r_french
