@@ -2,7 +2,6 @@ from re import T
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from integration.settings import MEDIA_ROOT
-from integration.settings import BASE_DIR
 from .models import ConnectSettings, BufferFood
 import requests
 import os
@@ -38,14 +37,19 @@ class CheckConnectionView(View):
             print(token_json, file=t_f) 
 
         return render(request, 'app_label_integr/checkconnection.html', context={
-            'post': token_json
+            'post': 'Токен получен'
     })     
 
 class BufferFoodView(View):
     def get(self, request, *args, **kwargs):
+
+        # Поставить в обработку исключения requests ниже (СДЕЛАТЬ!!!)
+        # вместе с чтением токена !!!
+        CheckConnection = CheckConnectionView()
+        CheckConnection.get(request)
         with open('t_file.txt', encoding='utf-8') as t_f:
              token = t_f.read().strip()
-        
+
         # Список организаций
         params_orgs = {"access_token": token} 
         orgs = requests.get("https://iiko.biz:9900/api/0/organization/list", params_orgs)
@@ -59,18 +63,20 @@ class BufferFoodView(View):
         prods = requests.get(f'https://iiko.biz:9900/api/0/nomenclature/{orgs_json[0]["id"]}', params_prods)
         prods_json = prods.json()
 
+        # Очистка табличного буфера
+        BufferFood.objects.all().delete()
+
         # Переменные для буфера
         restaurant_bf = orgs_json[0]["id"] # id_организации
-        name_bf = '' # Наименование продукта
-        description_bf = '' # Описание
-        price_bf = '' # Цена
-        category_bf = '' # Категория
-        image_bf = '' # Ссылка на картинку для буфера
-        imageID = '' # Уникальное имя картинки
+        # name_bf - Наименование продукта
+        # description_bf - Описание
+        # price_bf - Цена
+        # category_bf - Категория
+        # image_bf - Ссылка на картинку 
+        # imageID - Уникальное имя картинки
 
         # Проверяем путь к картинкам
         path = os.path.join(MEDIA_ROOT, 'upload', 'images', 'food/')
-        print(path)
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -79,7 +85,7 @@ class BufferFoodView(View):
             #print(prods_json[keys]) # Три list, int, string
             if keys == 'groups' or keys == 'productCategories' or keys == 'products':
                 for el in prods_json[keys]:
-                    #if keys == 'groups': #  ---- Не понял, что делать с ресторанами ------
+                    #if keys == 'groups': #  ---- Не понял пока, что делать с ресторанами ------
                     #    if el_key == 'id':
                     #        #print (el[el_key]) 
                     #        restaurant_bf = el[el_key]
@@ -100,14 +106,15 @@ class BufferFoodView(View):
                                         imageID = el[el_key][0]['imageId']
                                         image_bf = requests.get(el[el_key][0]['imageUrl'])
                                         with open(path + f'{imageID}.jpg', 'wb') as img_f:
-                                            img_f.write(image_bf.content) 
+                                            img_f.write(image_bf.content)
 
-
-                        #BufferFood.objects.all().delete()
-
+     
                         # Создаем запись в буфере  
-                        BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf)
-
+                        if img_f != None: # С картинкой
+                            BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf, image=img_f.name)
+                        else:
+                            BufferFood.objects.create(restaurant=restaurant_bf, name=name_bf, description=description_bf, price=price_bf, category=category_bf)                                
+                        img_f = None
 
         #prods_json['groups'][i] - рестораны организации
         #prods_json['groups'][i]['additionalInfo'] - имя (код) ресторана на латинице, например Ресторан Френч - r_french
