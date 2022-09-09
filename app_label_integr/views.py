@@ -76,7 +76,7 @@ class BufferFoodView(View):
         # imageID - Уникальное имя картинки
 
         # Проверяем путь к картинкам
-        path = os.path.join(MEDIA_ROOT, 'upload', 'images', 'food/')
+        path = os.path.join(MEDIA_ROOT, 'upload', 'images', 'food')
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -105,7 +105,7 @@ class BufferFoodView(View):
                                     if len(el[el_key]) != 0: 
                                         imageID = el[el_key][0]['imageId']
                                         image_bf = requests.get(el[el_key][0]['imageUrl'])
-                                        with open(path + f'{imageID}.jpg', 'wb') as img_f:
+                                        with open(path + f'/{imageID}.jpg', 'wb') as img_f:
                                             img_f.write(image_bf.content)
 
      
